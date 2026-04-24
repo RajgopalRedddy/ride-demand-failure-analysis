@@ -1,0 +1,69 @@
+# ============================================================
+# Project Configuration
+# When Do Models Fail? Discovering Hidden Failure Patterns
+# in Spatio-Temporal Ride Demand Prediction
+# ============================================================
+
+data:
+  # NYC TLC Yellow Taxi Trip Records - Full Year 2019
+  base_url: "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2019-{month:02d}.parquet"
+  year: 2019
+  months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+  taxi_zone_lookup: "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+  
+  # Aggregation
+  time_window_minutes: 30      # 30-minute time windows
+  pickup_col: "tpep_pickup_datetime"
+  zone_col: "PULocationID"
+  
+  # Paths
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  aggregated_file: "data/processed/demand_aggregated.parquet"
+  features_file: "data/processed/features_engineered.parquet"
+
+features:
+  # Lag features (in number of time windows)
+  lag_windows: [1, 2, 3, 6, 12, 24, 48]   # 0.5h, 1h, 1.5h, 3h, 6h, 12h, 24h
+  
+  # Rolling window features (in number of time windows)
+  rolling_windows: [6, 12, 24, 48]          # 3h, 6h, 12h, 24h
+  
+  # Target column
+  target: "trip_count"
+
+models:
+  test_size: 0.2            # Last 20% of data (temporal split)
+  random_state: 42
+  
+  linear_regression: {}
+  
+  random_forest:
+    n_estimators: 200
+    max_depth: 20
+    min_samples_split: 10
+    min_samples_leaf: 5
+    n_jobs: -1
+    random_state: 42
+  
+  lstm:
+    sequence_length: 48      # 24 hours of 30-min windows
+    hidden_size: 64
+    num_layers: 2
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 256
+    epochs: 30
+    patience: 5              # Early stopping patience
+
+failure_analysis:
+  error_percentile: 85       # Top 15% errors = failure cases
+  top_n_zones: 20            # Top zones to visualize
+
+evaluation:
+  metrics: ["MAE", "RMSE", "MAPE"]
+
+output:
+  figures_dir: "outputs/figures"
+  models_dir: "outputs/models"
+  reports_dir: "outputs/reports"
