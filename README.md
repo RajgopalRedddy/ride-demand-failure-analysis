@@ -1,9 +1,5 @@
 # When Do Models Fail? Discovering Hidden Failure Patterns in Spatio-Temporal Ride Demand Prediction
 
-## Team
-- **Siva Rama Krishna Kasyap Sonthi** — SS24BW
-- **Rajgopal Reddy Musku** — RM24M
-
 ---
 
 ## Overview
